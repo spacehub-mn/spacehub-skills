@@ -1,0 +1,15 @@
+{
+  "name": "spacehub-skills",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Spacehub Claude Code plugin marketplace",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "new-skill": "node scripts/new-skill.mjs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

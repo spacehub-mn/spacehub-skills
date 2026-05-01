@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "spacehub-mn",
+  "description": "Curated Claude Code skills for Spacehub workflows: infra, content, and developer tooling.",
+  "owner": {
+    "name": "Spacehub",
+    "url": "https://spacehub.mn"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "infra-toolkit",
+      "source": "./plugins/infra-toolkit",
+      "description": "Infrastructure skills for Cloudflare, Prometheus, and Linux server ops",
+      "category": "infrastructure",
+      "tags": ["cloudflare", "prometheus", "monitoring", "ops"],
+      "license": "MIT",
+      "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/infra-toolkit"
+    },
+    {
+      "name": "content-ops",
+      "source": "./plugins/content-ops",
+      "description": "Content and communication skills for marketing and internal comms",
+      "category": "content",
+      "tags": ["slack", "marketing", "mongolian"],
+      "license": "MIT",
+      "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/content-ops"
+    },
+    {
+      "name": "dev-toolkit",
+      "source": "./plugins/dev-toolkit",
+      "description": "Developer tooling for Claude Code config, Drizzle + D1, and SvelteKit on Workers",
+      "category": "productivity",
+      "tags": ["claude-code", "drizzle", "sveltekit", "cloudflare"],
+      "license": "MIT",
+      "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/dev-toolkit"
+    }
+  ]
+}

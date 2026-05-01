@@ -1,0 +1,13 @@
+{
+  "name": "infra-toolkit",
+  "description": "Spacehub infrastructure skills: Cloudflare D1, Workers debug, Prometheus alerts.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Spacehub",
+    "url": "https://spacehub.mn"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/spacehub-mn/spacehub-skills",
+  "repository": "https://github.com/spacehub-mn/spacehub-skills",
+  "keywords": ["cloudflare", "d1", "workers", "prometheus", "ops"]
+}

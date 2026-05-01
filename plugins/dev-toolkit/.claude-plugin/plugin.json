@@ -1,0 +1,13 @@
+{
+  "name": "dev-toolkit",
+  "description": "Developer tooling skills: code audit, Claude Code settings, Drizzle + D1.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Spacehub",
+    "url": "https://spacehub.mn"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/spacehub-mn/spacehub-skills",
+  "repository": "https://github.com/spacehub-mn/spacehub-skills",
+  "keywords": ["claude-code", "drizzle", "sveltekit", "cloudflare-workers"]
+}
