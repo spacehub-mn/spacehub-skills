@@ -1,10 +1,10 @@
 # content-ops
 
-Content and communication skills for marketing and internal comms.
+Content and communication skills.
 
 ## Install
 
-```bash
+```
 /plugin marketplace add spacehub-mn/spacehub-skills
 /plugin install content-ops@spacehub-mn
 ```
@@ -13,7 +13,6 @@ Content and communication skills for marketing and internal comms.
 
 | Skill | What it covers |
 |---|---|
-| [`slack-status-report`](skills/slack-status-report/SKILL.md) | Session summaries / daily standups in the team's lowercase casual format |
-| [`mongolian-copy-review`](skills/mongolian-copy-review/SKILL.md) | Reviewing Mongolian copy for tone, register, and house style |
+| [`session-report`](skills/session-report/SKILL.md) | Summarizes the current Claude Code session in Mongolian and posts to Slack via the Slack MCP. Tracks per-project channel history in `.session-report-history.json`. |
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.

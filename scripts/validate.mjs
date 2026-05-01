@@ -33,15 +33,38 @@ function parseFrontmatter(src, where) {
     return null;
   }
   const block = rest.slice(0, end);
+  const lines = block.split(/\r?\n/);
   const out = {};
-  for (const rawLine of block.split(/\r?\n/)) {
-    const line = rawLine.trimEnd();
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trimEnd();
     if (!line || line.startsWith("#")) continue;
     const m = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
     if (!m) continue;
     const key = m[1];
     let val = m[2];
-    if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+    if (val === ">" || val === ">-" || val === "|" || val === "|-") {
+      const folded = val.startsWith(">");
+      const collected = [];
+      let baseIndent = null;
+      while (i + 1 < lines.length) {
+        const next = lines[i + 1];
+        if (next.length === 0) {
+          if (!folded) collected.push("");
+          i++;
+          continue;
+        }
+        const indentMatch = next.match(/^(\s+)/);
+        if (!indentMatch) break;
+        const indent = indentMatch[1].length;
+        if (baseIndent === null) baseIndent = indent;
+        if (indent < baseIndent) break;
+        collected.push(next.slice(baseIndent));
+        i++;
+      }
+      val = folded ? collected.join(" ").replace(/\s+/g, " ").trim() : collected.join("\n");
+    } else {
+      if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+    }
     out[key] = val;
   }
   return out;

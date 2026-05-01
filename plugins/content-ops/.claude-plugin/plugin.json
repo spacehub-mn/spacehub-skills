@@ -1,7 +1,7 @@
 {
   "name": "content-ops",
-  "description": "Content + comms skills: Slack status reports, Mongolian copy review.",
-  "version": "0.1.0",
+  "description": "Content + comms skills. Ships /content-ops:session-report for Mongolian Slack session summaries.",
+  "version": "0.2.0",
   "author": {
     "name": "Spacehub",
     "url": "https://spacehub.mn"
@@ -9,5 +9,5 @@
   "license": "MIT",
   "homepage": "https://github.com/spacehub-mn/spacehub-skills",
   "repository": "https://github.com/spacehub-mn/spacehub-skills",
-  "keywords": ["slack", "marketing", "mongolian", "content"]
+  "keywords": ["slack", "mongolian", "session-report"]
 }

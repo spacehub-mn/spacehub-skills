@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "spacehub-mn",
-  "description": "Curated Claude Code skills for Spacehub workflows: infra, content, and developer tooling.",
+  "description": "Curated Claude Code skills for Spacehub workflows.",
   "owner": {
     "name": "Spacehub",
     "url": "https://spacehub.mn"
@@ -11,29 +11,20 @@
   },
   "plugins": [
     {
-      "name": "infra-toolkit",
-      "source": "./plugins/infra-toolkit",
-      "description": "Infrastructure skills for Cloudflare, Prometheus, and Linux server ops",
-      "category": "infrastructure",
-      "tags": ["cloudflare", "prometheus", "monitoring", "ops"],
-      "license": "MIT",
-      "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/infra-toolkit"
-    },
-    {
       "name": "content-ops",
       "source": "./plugins/content-ops",
-      "description": "Content and communication skills for marketing and internal comms",
+      "description": "Content + comms skills, including Mongolian session reports to Slack",
       "category": "content",
-      "tags": ["slack", "marketing", "mongolian"],
+      "tags": ["slack", "mongolian", "session-report"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/content-ops"
     },
     {
       "name": "dev-toolkit",
       "source": "./plugins/dev-toolkit",
-      "description": "Developer tooling for Claude Code config, Drizzle + D1, and SvelteKit on Workers",
+      "description": "Developer tooling. Currently ships an audit skill for multi-agent code review of recent changes",
       "category": "productivity",
-      "tags": ["claude-code", "drizzle", "sveltekit", "cloudflare"],
+      "tags": ["audit", "code-review", "claude-code"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/dev-toolkit"
     }
