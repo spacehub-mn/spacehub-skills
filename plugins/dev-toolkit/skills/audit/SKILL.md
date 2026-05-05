@@ -1,14 +1,20 @@
 ---
 name: audit
-description: Review recently-touched code for bugs, oversights, security issues, and convention violations. Use when the user asks to "audit", "review", "sanity-check", "predeploy-check", or "scan" recent changes — including phrasings like "did I break anything", "go over what we just did", "find blunders". Targets code Claude touched (uncommitted working-tree changes plus recent Claude-coauthored commits) by default; with arg "uncommitted" or "wt" only the working tree is reviewed.
+description: Deep multi-agent review of recently-touched code, where five reviewer personas (cynical veteran, adversarial hacker, meticulous finisher, convention enforcer, product-intent reviewer) each read the whole diff through their own lens. Use when the user asks to "audit", "review", "deep-review", "predeploy-check", or "scan" recent changes — including phrasings like "did I break anything", "go over what we just did", "find blunders". For a faster, lighter pass split by topic, use the `quick-audit` skill instead. Targets code Claude touched (uncommitted working-tree changes plus recent Claude-coauthored commits) by default; with arg "uncommitted" or "wt" only the working tree is reviewed.
 ---
 
 # Audit
 
-A multi-step, multi-agent audit of recent code changes. The goal is to catch
-**likely bugs, forgotten work, security holes, and convention violations** —
-not to lecture about tests, abstractions, or style nits the codebase doesn't
-already enforce.
+A deep, multi-step, multi-agent audit of recent code changes. Five reviewer
+personas each read the **whole diff** through their own lens; findings that
+multiple personas independently surface carry the most signal. The goal is to
+catch **likely bugs, forgotten work, security holes, intent mismatches, and
+convention violations** — not to lecture about tests, abstractions, or style
+nits the codebase doesn't already enforce.
+
+This is the slower, more thorough sibling of `quick-audit`. Reach for this
+when the change is risky, large, or about to ship; reach for `quick-audit`
+when you just want a fast sanity check.
 
 ## Language
 
@@ -38,8 +44,10 @@ If the user passed `branch` or `vs-main`, also include `git diff <main>...HEAD`
 (use the branch returned by `git symbolic-ref refs/remotes/origin/HEAD` or fall
 back to `main`).
 
-For each Claude-coauthored commit found, capture the diff with
-`git show --stat <hash>` (just stats — full diffs go to sub-agents).
+For each Claude-coauthored commit found, capture both the stats
+(`git show --stat <hash>`) and the commit message (`git show -s --format=%B
+<hash>`) — the message is needed by the product-intent persona in step 5. Full
+diffs go to the sub-agents.
 
 If the combined target is empty, report "No recent Claude-touched changes to
 audit." and stop.
@@ -92,47 +100,93 @@ For any TypeScript / JavaScript / Svelte / Node project:
 Run lint in the background in parallel with the agent dispatch in step 5 — by
 the time agents return, lint output is usually ready.
 
-### 5. Dispatch parallel investigation agents
+### 5. Dispatch five persona agents in parallel
 
-Spawn **multiple Explore / general-purpose subagents in a single message** so
-they run concurrently. Each gets a focused brief and a list of relevant files
-from the diff.
+Spawn **five general-purpose subagents in a single message** so they run
+concurrently. Each persona reviews the **entire diff** (not a slice of it) and
+returns findings through their own lens. Overlap is expected and useful —
+findings raised by multiple personas independently are the highest-signal.
 
-Suggested split (collapse or expand based on diff size):
+Use `subagent_type: "general-purpose"` for personas 1–5, except the cynical
+veteran which can use `Explore` if it needs to read a lot of caller-side
+context outside the diff.
 
-- **Bugs & correctness** — wrong logic, off-by-one, race conditions, broken
-  null checks, regressed behavior, mismatched types, missed error paths at
-  real boundaries (network/IO/user input). Read callers of changed functions
-  to detect breakage outside the diff.
-- **Forgotten / incomplete** — half-wired features, message keys referenced
-  but not added, env vars used but not declared, new components not exported,
-  TODOs added, dead code, callers not updated to match a changed signature,
-  feature flags left on the wrong default.
-- **Security** — secrets in code, missing authz checks, SQL/NoSQL injection,
-  unsafe HTML rendering, open redirect / SSRF, weak input validation at the
-  boundary, leaked PII in logs, broken CSRF assumptions. Don't speculate
-  about purely hypothetical attacks.
-- **Conventions** — violations of the loaded `CLAUDE.md` and memory rules
-  (e.g. paraglide source-of-truth, no manual migration generation, format-on-
-  finish, use pnpm not npm). Cross-check style against neighboring code in the
-  same project, not against generic best practices.
+Brief each agent like a colleague: hand it the project type, the full list of
+in-scope changed files (with paths), the relevant CLAUDE.md / memory rules
+loaded in step 2, the recent Claude commit messages (for persona 5), and ask
+for "under N findings, only the ones you'd actually flag in a code review."
+Tell each agent **not** to suggest tests, abstractions, or speculative
+improvements — only concrete defects through their lens.
 
-Each agent must return findings in the schema below — nothing else.
+Each agent must return findings in this schema (and nothing else):
 
-Brief each agent like a colleague: tell it the project type, the specific
-files in its slice of the diff (with paths), the relevant CLAUDE.md / memory
-rules to enforce, and ask for "under N findings, only the ones you'd actually
-flag in a code review." Tell each agent **not** to suggest tests, abstractions,
-or speculative improvements — only concrete defects.
+```
+- <severity 🔴/🟡/🟢> `path/to/file.ts:LINE` — <one-line finding>
+  [optional 1-line follow-up]
+```
+
+#### Persona 1 — Cynical veteran
+
+> "I've seen this fail in prod before."
+
+Looks for: regressions in untouched callers, broken null/undefined handling,
+race conditions, off-by-one errors, mismatched types crossing boundaries,
+silent failure modes, retry-loop bombs, missed error paths at real boundaries
+(network/IO/user input). **Reads callers of changed functions** to detect
+breakage outside the diff.
+
+#### Persona 2 — Adversarial hacker
+
+> "How do I exploit this?"
+
+Looks for: missing authz/authn checks, SQL/NoSQL injection, unsafe HTML
+rendering / XSS, open redirect, SSRF, CSRF assumption breaks, weak input
+validation at the trust boundary, secrets/keys committed to code, PII in logs,
+prototype pollution, path traversal. Doesn't speculate about purely
+hypothetical attacks — only concrete vectors traceable through this diff.
+
+#### Persona 3 — Meticulous finisher
+
+> "Did you actually finish?"
+
+Looks for: half-wired features, message keys referenced but not added, env
+vars used but not declared (`.env.example`, deployment config), new components
+not exported, TODOs/FIXMEs added in this diff, dead code, callers not updated
+to match a changed signature, feature flags left on the wrong default,
+dangling imports, partially renamed symbols.
+
+#### Persona 4 — Convention enforcer
+
+> "Does this match the house style?"
+
+Looks for: violations of the loaded `CLAUDE.md` and memory rules (paraglide
+source-of-truth, no manual migration generation, format-on-finish, pnpm not
+npm, etc.), divergence from neighboring-file patterns in the same project,
+framework-idiom violations specific to this stack. Cross-checks against
+neighboring code, **not** generic best practices.
+
+#### Persona 5 — Product-intent reviewer
+
+> "Does the code do what the commit/PR claims?"
+
+Reads the recent Claude commit messages and the diff together. Looks for:
+scope creep (changes unrelated to the stated goal), silent behavior changes
+not mentioned in the message, intent/implementation mismatches, places where
+the message describes one thing but the code does another, "drive-by" edits
+that should have been their own commit.
 
 ### 6. Synthesize the report
 
-Merge agent findings + lint output. Deduplicate. Drop anything that violates
-the **out-of-scope** list below. Sort within each tier by file path.
+Merge all five personas' findings + lint output. **Deduplicate aggressively**:
+when multiple personas raise the same issue, keep the clearest phrasing and
+note the convergence inline (e.g. "[flagged by 3 personas]" — this is a
+strong signal). Drop anything that violates the **out-of-scope** list below.
+Sort within each tier by file path.
 
 ```
 ## 🔴 Likely bugs / security
-- `path/to/file.ts:42` — <one-line why>. <optional 2nd line if needed>
+- `path/to/file.ts:42` — <one-line why>. [flagged by 3 personas]
+  <optional 2nd line if needed>
 - ...
 
 ## 🟡 Forgotten / incomplete
@@ -152,8 +206,9 @@ Each line: file path with line number, one-line rationale. **No wall-of-text
 explanations.** If something genuinely needs more, add one indented follow-up
 line max.
 
-End with a one-sentence verdict: e.g. "Looks shippable, two 🟡 worth a quick
-pass" or "Don't ship — 🔴 #1 will break login."
+End with a one-sentence verdict that reflects the convergence: e.g. "Looks
+shippable, two 🟡 worth a quick pass" or "Don't ship — 🔴 #1 was independently
+flagged by 4 of 5 personas and will break login."
 
 ## Out of scope (do NOT flag)
 
@@ -173,5 +228,5 @@ pass" or "Don't ship — 🔴 #1 will break login."
   - `<no arg>` — default: uncommitted + recent Claude commits
   - `uncommitted` / `wt` — working tree only
   - `branch` / `vs-main` — full branch diff vs main
-- Treat any other arg as a free-text focus hint passed to the agents
+- Treat any other arg as a free-text focus hint passed to all five personas
   ("focus on auth changes", "look hard at the migration").
