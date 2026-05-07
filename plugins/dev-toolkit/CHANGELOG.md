@@ -1,5 +1,11 @@
 # Changelog — dev-toolkit
 
+## 0.5.0 — 2026-05-07
+
+- Reworked `audit` from five personas to three (skeptic, adversary, maintainer): the skeptic absorbs cynical-veteran + meticulous-finisher; the maintainer absorbs convention-enforcer + product-intent reviewer; adversary unchanged. Three-way convergence is a clearer signal than five-way overlap.
+- Added explicit severity rubric with a triage gate before publishing 🔴, plus an ℹ️ "watching brief" tier for "if you ever add X" findings that previously inflated the 🔴/🟡 lists.
+- Skeptic now explicitly hunts timebombs (hardcoded dates, expiring secrets, EOL deps); maintainer now explicitly hunts deferred essential follow-ups (missing migrations, stale `.env.example`, unflipped flags).
+
 ## 0.4.0 — 2026-05-06
 
 - Renamed previous `audit` (topic-split, fast) to `quick-audit` — same workflow, new name.
