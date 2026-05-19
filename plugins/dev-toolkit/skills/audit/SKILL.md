@@ -170,6 +170,10 @@ agent **not** to suggest tests, abstractions, or speculative improvements —
 only concrete defects through their lens, and to **default to lower severity
 when uncertain** rather than padding the 🔴 list.
 
+Per-persona budget: ~8–12 tool calls (Read, Grep, etc.). Stop when confident;
+don't read every file in the repo chasing weak signals. Return as soon as
+findings are solid even if the budget isn't exhausted.
+
 Each agent must return findings in this schema (and nothing else):
 
 ```
@@ -273,6 +277,13 @@ conditions" findings are 🟡, not 🔴 — make peace with that.
 
 When the report ends with a verdict like "looks shippable, just nits" but
 the 🔴 list is long, you've miscategorized — go back and downgrade.
+
+**Preserve dissent.** If only 1 of 3 personas raised a finding, keep it with
+`[skeptic only]` / `[adversary only]` / `[maintainer only]` rather than
+silently dropping it — minority findings are sometimes the highest-signal
+ones (an exploit angle only the adversary saw, a deferred follow-up only the
+maintainer caught). Apply the severity rubric above to decide the tier; a
+single-persona 🔴 still has to survive the triage gate.
 
 ```
 ## 🔴 Likely bugs / security

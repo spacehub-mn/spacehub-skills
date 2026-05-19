@@ -1,5 +1,12 @@
 # Changelog — dev-toolkit
 
+## 0.6.0 — 2026-05-19
+
+- Added `audit-fixes` skill — applies fixes for the high-impact findings from a recent `audit` / `quick-audit` (🔴 severe bugs, UX-breakers, latent footguns, straight-out wrong code) and leaves style nits / speculation / abstraction suggestions alone. Shows the fix-list then proceeds, runs `pnpm lint` at the end.
+- Added per-subagent tool-call budgets and early-stop instructions to `audit` and `quick-audit` to address the documented "endless search" multi-agent failure mode (per Anthropic's multi-agent research system writeup).
+- `audit` and `quick-audit` synthesis steps now explicitly preserve dissent — single-persona / single-agent findings are kept with attribution (e.g. `[adversary only]`) rather than silently deduped away.
+- `audit-fixes` description written in third person ("Applies fixes…") for consistent skill-routing per Anthropic's skill-authoring guidance.
+
 ## 0.5.0 — 2026-05-07
 
 - Reworked `audit` from five personas to three (skeptic, adversary, maintainer): the skeptic absorbs cynical-veteran + meticulous-finisher; the maintainer absorbs convention-enforcer + product-intent reviewer; adversary unchanged. Three-way convergence is a clearer signal than five-way overlap.

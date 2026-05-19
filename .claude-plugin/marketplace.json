@@ -22,11 +22,20 @@
     {
       "name": "dev-toolkit",
       "source": "./plugins/dev-toolkit",
-      "description": "Developer tooling. Currently ships an audit skill for multi-agent code review of recent changes",
+      "description": "Developer tooling. Ships audit / quick-audit for multi-agent code review of recent changes, plus audit-fixes for applying the high-impact findings",
       "category": "productivity",
       "tags": ["audit", "code-review", "claude-code"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/dev-toolkit"
+    },
+    {
+      "name": "research-toolkit",
+      "source": "./plugins/research-toolkit",
+      "description": "Online research skills. Ships deep-research (cited HTML report) and ux-research / ui-research (UX research synthesized into 3–6 live-rendered UI variation mockups). All reports open in the browser",
+      "category": "productivity",
+      "tags": ["research", "web-search", "html-report", "ui", "ux"],
+      "license": "MIT",
+      "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/research-toolkit"
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "name": "research-toolkit",
+  "description": "Online research skills. Ships /research-toolkit:deep-research (multi-agent web research → cited HTML report) and /research-toolkit:ux-research (UX research → 3–6 live-rendered UI variation mockups in an HTML report, with /ui-research as an alias). All reports land in /tmp/claude-research/ and open in the default browser.",
+  "version": "0.2.1",
+  "author": {
+    "name": "Spacehub",
+    "url": "https://spacehub.mn"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/spacehub-mn/spacehub-skills",
+  "repository": "https://github.com/spacehub-mn/spacehub-skills",
+  "keywords": ["research", "web-search", "html-report", "claude-code"]
+}

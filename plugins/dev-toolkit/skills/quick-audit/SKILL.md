@@ -128,10 +128,17 @@ rules to enforce, and ask for "under N findings, only the ones you'd actually
 flag in a code review." Tell each agent **not** to suggest tests, abstractions,
 or speculative improvements — only concrete defects.
 
+Per-agent budget: ~6–10 tool calls. Stop when confident; don't grep the whole
+repo chasing weak signals. Return early if findings are solid.
+
 ### 6. Synthesize the report
 
 Merge agent findings + lint output. Deduplicate. Drop anything that violates
 the **out-of-scope** list below. Sort within each tier by file path.
+
+**Preserve dissent**: a finding raised by only one agent isn't automatically
+weak — keep it with a brief note (e.g. "flagged in security pass only")
+rather than silently dropping it, especially when it's a 🔴.
 
 ```
 ## 🔴 Likely bugs / security
