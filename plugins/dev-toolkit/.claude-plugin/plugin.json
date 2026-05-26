@@ -9,5 +9,5 @@
   "license": "MIT",
   "homepage": "https://github.com/spacehub-mn/spacehub-skills",
   "repository": "https://github.com/spacehub-mn/spacehub-skills",
-  "keywords": ["audit", "code-review", "claude-code"]
+  "keywords": ["audit", "code-review"]
 }

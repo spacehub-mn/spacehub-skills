@@ -5,8 +5,7 @@ Online research skills that produce shareable artifacts.
 ## Install
 
 ```
-/plugin marketplace add spacehub-mn/spacehub-skills
-/plugin install research-toolkit@spacehub-mn
+pnpx skills add spacehub-mn/spacehub-skills research-toolkit
 ```
 
 ## Skills

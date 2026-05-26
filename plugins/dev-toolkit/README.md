@@ -5,8 +5,7 @@ Developer tooling skills.
 ## Install
 
 ```
-/plugin marketplace add spacehub-mn/spacehub-skills
-/plugin install dev-toolkit@spacehub-mn
+pnpx skills add spacehub-mn/spacehub-skills dev-toolkit
 ```
 
 ## Skills

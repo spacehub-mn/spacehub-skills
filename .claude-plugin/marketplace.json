@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "spacehub-mn",
-  "description": "Curated Claude Code skills for Spacehub workflows.",
+  "description": "Curated skills for Spacehub workflows.",
   "owner": {
     "name": "Spacehub",
     "url": "https://spacehub.mn"
@@ -24,7 +24,7 @@
       "source": "./plugins/dev-toolkit",
       "description": "Developer tooling. Ships audit / quick-audit for multi-agent code review of recent changes, plus audit-fixes for applying the high-impact findings",
       "category": "productivity",
-      "tags": ["audit", "code-review", "claude-code"],
+      "tags": ["audit", "code-review"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/dev-toolkit"
     },
