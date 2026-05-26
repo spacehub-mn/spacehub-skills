@@ -31,9 +31,9 @@
     {
       "name": "research-toolkit",
       "source": "./plugins/research-toolkit",
-      "description": "Online research skills. Ships deep-research (cited HTML report) and ux-research / ui-research (UX research synthesized into 3–6 live-rendered UI variation mockups). All reports open in the browser",
+      "description": "Online research skills. Ships deep-research (cited HTML report), ux-research / ui-research (live-rendered UI variation mockups), and price-estimate (competitive pricing analysis with pessimistic bias). All reports open in the browser",
       "category": "productivity",
-      "tags": ["research", "web-search", "html-report", "ui", "ux"],
+      "tags": ["research", "web-search", "html-report", "ui", "ux", "pricing"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/research-toolkit"
     }

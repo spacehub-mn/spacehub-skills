@@ -1,5 +1,9 @@
 # Changelog — research-toolkit
 
+## 0.3.0 — 2026-05-27
+
+- Added `price-estimate` skill — researches competitive pricing for a product, service, or SaaS idea using 4–6 parallel subagents (direct competitors, adjacent alternatives, cost structure, willingness-to-pay signals, pricing model patterns, recent market moves). Applies a pessimistic bias throughout: costs round up, revenue estimates anchor low, hidden costs (payment processing, support burden, free-tier subsidy) are surfaced explicitly. Produces a standalone HTML report with competitor table, cost breakdown, tier recommendations, pricing risks, and a recommended start-here price with range.
+
 ## 0.2.1 — 2026-05-19
 
 - Added per-subagent tool-call budgets and early-stop instructions to `deep-research` and `ux-research` (5–10 calls typical, 10–15 for comparison-heavy angles) to address the documented "endless search" multi-agent failure mode.

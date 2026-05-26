@@ -1,7 +1,7 @@
 {
   "name": "research-toolkit",
-  "description": "Online research skills. Ships /research-toolkit:deep-research (multi-agent web research → cited HTML report) and /research-toolkit:ux-research (UX research → 3–6 live-rendered UI variation mockups in an HTML report, with /ui-research as an alias). All reports land in /tmp/claude-research/ and open in the default browser.",
-  "version": "0.2.1",
+  "description": "Online research skills. Ships /research-toolkit:deep-research (multi-agent web research → cited HTML report), /research-toolkit:ux-research (UX research → live-rendered UI variation mockups, with /ui-research as alias), and /research-toolkit:price-estimate (competitive pricing research → pessimistic price estimate with competitor analysis). All reports land in /tmp/claude-research/ and open in the default browser.",
+  "version": "0.3.0",
   "author": {
     "name": "Spacehub",
     "url": "https://spacehub.mn"
