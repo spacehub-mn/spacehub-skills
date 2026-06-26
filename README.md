@@ -15,7 +15,7 @@ pnpx skills add spacehub-mn/spacehub-skills dev-toolkit
 
 | Plugin | Skills | Description |
 |---|---|---|
-| [`content-ops`](plugins/content-ops) | `session-report` | Mongolian session summary posted to Slack |
+| [`content-ops`](plugins/content-ops) | `session-report`, `presentation` | Mongolian session summary posted to Slack; beautiful self-contained HTML slide decks built into a reusable `.presentation/` folder |
 | [`dev-toolkit`](plugins/dev-toolkit) | `audit`, `quick-audit`, `audit-fixes` | Multi-agent review of recent code changes, plus an `audit-fixes` pass to apply the high-impact findings |
 | [`research-toolkit`](plugins/research-toolkit) | `deep-research`, `ux-research`, `ui-research`, `price-estimate` | Wide multi-agent web research → standalone HTML reports. `ux-research` / `ui-research` adds live-rendered UI variation mockups; `price-estimate` adds pessimistic competitive pricing analysis |
 

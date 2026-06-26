@@ -13,9 +13,9 @@
     {
       "name": "content-ops",
       "source": "./plugins/content-ops",
-      "description": "Content + comms skills, including Mongolian session reports to Slack",
+      "description": "Content + comms skills. Mongolian session reports to Slack, plus beautiful self-contained HTML slide decks (presentation)",
       "category": "content",
-      "tags": ["slack", "mongolian", "session-report"],
+      "tags": ["slack", "mongolian", "session-report", "presentation", "slides", "deck"],
       "license": "MIT",
       "homepage": "https://github.com/spacehub-mn/spacehub-skills/tree/main/plugins/content-ops"
     },

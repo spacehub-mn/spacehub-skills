@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{TITLE}}</title>
+<style>
+/* ============================================================================
+   THEME TOKENS — overridden per project by inlining .presentation/theme.css.
+   Everything visual flows from these custom properties. The slide STAGE is a
+   fixed 1280×720 (16:9) canvas scaled to fit any viewport, so layouts never
+   reflow — what you design is what projects.
+   ========================================================================== */
+:root {
+  --stage-w: 1280px;
+  --stage-h: 720px;
+
+  --bg: #0e1014;
+  --fg: #f4f5f7;
+  --muted: #9aa3b0;
+  --surface: #181b22;
+  --border: #272b34;
+  --accent: #7aa2ff;
+  --accent-2: #b388ff;
+  --accent-fg: #0e1014;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+
+  --pad: 88px;          /* slide inner padding */
+  --gap: 28px;
+  --radius: 14px;
+}
+
+/* ----- PROJECT THEME (inlined here at build time) ------------------------ */
+/* {{THEME}} */
+
+/* ============================================================================
+   BASE + STAGE
+   ========================================================================== */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); }
+body {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#stage {
+  position: fixed;
+  top: 50%; left: 50%;
+  width: var(--stage-w);
+  height: var(--stage-h);
+  transform-origin: center center;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: var(--pad);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--gap);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+}
+.slide.active { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+.slide.is-past { transform: translateY(-14px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide { transition: opacity .15s linear; transform: none !important; }
+}
+
+/* ----- TYPOGRAPHY -------------------------------------------------------- */
+.slide h1, .slide h2, .slide h3 { margin: 0; font-family: var(--font-display); line-height: 1.08; letter-spacing: -0.02em; font-weight: 700; }
+.slide h1 { font-size: 76px; }
+.slide h2 { font-size: 52px; }
+.slide h3 { font-size: 34px; font-weight: 650; }
+.slide p  { margin: 0; font-size: 28px; line-height: 1.5; color: var(--fg); }
+.slide .lead { font-size: 34px; line-height: 1.45; color: var(--muted); }
+.slide small, .slide .kicker { font-size: 20px; }
+.kicker { text-transform: uppercase; letter-spacing: .16em; font-weight: 600; color: var(--accent); font-size: 19px; }
+.muted { color: var(--muted); }
+.slide a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.slide ul, .slide ol { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 16px; }
+.slide li { font-size: 28px; line-height: 1.4; }
+.slide li::marker { color: var(--accent); }
+.slide code { font-family: var(--font-mono); font-size: .9em; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; }
+.slide pre { font-family: var(--font-mono); font-size: 22px; line-height: 1.5; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; overflow: auto; }
+.slide pre code { background: none; border: 0; padding: 0; }
+
+/* ----- LAYOUTS (data-layout) -------------------------------------------- */
+.slide[data-layout="title"]    { justify-content: center; }
+.slide[data-layout="title"] h1 { font-size: 92px; max-width: 18ch; }
+.slide[data-layout="title"] .lead { max-width: 34ch; }
+
+.slide[data-layout="section"]  { justify-content: center; }
+.slide[data-layout="section"] .index { font-size: 26px; color: var(--accent); font-family: var(--font-mono); letter-spacing: .1em; }
+.slide[data-layout="section"] h2 { font-size: 72px; max-width: 20ch; }
+
+.slide[data-layout="statement"] { justify-content: center; align-items: flex-start; }
+.slide[data-layout="statement"] h2 { font-size: 64px; max-width: 22ch; line-height: 1.18; }
+
+.slide[data-layout="quote"] { justify-content: center; }
+.slide[data-layout="quote"] blockquote { margin: 0; font-size: 48px; line-height: 1.3; font-weight: 600; max-width: 26ch; }
+.slide[data-layout="quote"] blockquote::before { content: "\201C"; color: var(--accent); }
+.slide[data-layout="quote"] .attrib { font-size: 26px; color: var(--muted); margin-top: 12px; }
+
+.slide[data-layout="two-col"] .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+
+.slide[data-layout="metrics"] .grid { display: grid; grid-auto-flow: column; gap: 56px; }
+.slide[data-layout="metrics"] .stat .n { font-size: 84px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.03em; color: var(--accent); }
+.slide[data-layout="metrics"] .stat .l { font-size: 24px; color: var(--muted); margin-top: 6px; }
+
+.slide[data-layout="image"]    { padding: 0; }
+.slide[data-layout="image"] .bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.slide[data-layout="image"] .overlay { position: relative; margin-top: auto; padding: var(--pad); background: linear-gradient(transparent, color-mix(in srgb, var(--bg) 85%, transparent)); }
+
+.slide[data-layout="split"] .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; position: absolute; inset: 0; }
+.slide[data-layout="split"] .pane { padding: var(--pad); display: flex; flex-direction: column; justify-content: center; gap: var(--gap); }
+.slide[data-layout="split"] .pane.media { padding: 0; background-size: cover; background-position: center; }
+
+.slide[data-layout="end"] { justify-content: center; }
+.slide[data-layout="end"] h2 { font-size: 64px; }
+
+/* slide number watermark */
+.slide .pagenum { position: absolute; bottom: 30px; right: 38px; font-size: 17px; color: var(--muted); font-variant-numeric: tabular-nums; opacity: .65; }
+
+/* fragments — progressive reveal */
+.fragment { opacity: 0; transition: opacity .35s ease, transform .35s ease; transform: translateY(8px); }
+.fragment.is-visible { opacity: 1; transform: none; }
+
+/* ============================================================================
+   CHROME — progress, HUD, overlays
+   ========================================================================== */
+#progress { position: fixed; left: 0; top: 0; height: 3px; width: 100%; background: transparent; z-index: 20; }
+#progress > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s ease; }
+
+#hud { position: fixed; bottom: 14px; right: 18px; z-index: 20; display: flex; gap: 14px; align-items: center;
+  font: 500 14px/1 var(--font-sans); color: var(--muted); opacity: 0; transition: opacity .3s; }
+body:hover #hud, #hud:focus-within { opacity: .9; }
+#hud button { all: unset; cursor: pointer; padding: 5px 7px; border-radius: 6px; color: var(--muted); }
+#hud button:hover { color: var(--fg); background: color-mix(in srgb, var(--fg) 10%, transparent); }
+#counter { font-variant-numeric: tabular-nums; }
+
+.overlay-screen { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--bg) 92%, #000); color: var(--fg);
+  display: none; padding: 40px; overflow: auto; }
+.overlay-screen.open { display: block; }
+
+#overview .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+#overview .thumb { position: relative; aspect-ratio: 16/9; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--bg); }
+#overview .thumb.current { outline: 3px solid var(--accent); }
+#overview .thumb .scaler { position: absolute; top: 0; left: 0; width: 1280px; height: 720px; transform-origin: top left; pointer-events: none; }
+#overview .thumb .n { position: absolute; bottom: 6px; right: 8px; font: 600 13px var(--font-mono); color: var(--fg); background: color-mix(in srgb, var(--bg) 70%, transparent); padding: 1px 5px; border-radius: 4px; }
+
+#help { font: 16px/1.7 var(--font-sans); }
+#help h3 { margin-top: 0; }
+#help kbd { font-family: var(--font-mono); background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 7px; font-size: 13px; }
+#help table { border-collapse: collapse; }
+#help td { padding: 5px 18px 5px 0; }
+.overlay-screen .close-hint { position: fixed; top: 18px; right: 22px; color: var(--muted); font-size: 13px; }
+
+/* ============================================================================
+   PRINT → PDF. Each slide becomes one landscape page. Run Cmd/Ctrl+P → Save as PDF.
+   ========================================================================== */
+@page { size: 1280px 720px; margin: 0; }
+@media print {
+  html, body { overflow: visible; height: auto; background: #fff; }
+  #stage { position: static; transform: none !important; width: 1280px; height: auto; }
+  .slide { position: relative; inset: auto; opacity: 1 !important; visibility: visible !important; transform: none !important;
+    width: 1280px; height: 720px; break-after: page; page-break-after: always; }
+  .fragment { opacity: 1 !important; transform: none !important; }
+  #progress, #hud, .overlay-screen { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <!-- {{SLIDES}} -->
+  <!-- Each slide:
+       <section class="slide" data-layout="content">
+         <span class="kicker">Section</span>
+         <h2>Heading</h2>
+         <ul><li class="fragment">point</li></ul>
+         <aside class="notes">Speaker notes for presenter view.</aside>
+       </section>
+  -->
+</div>
+
+<div id="progress"><i></i></div>
+
+<div id="hud">
+  <span id="counter">1 / 1</span>
+  <button data-act="overview" title="Overview (O)">▦</button>
+  <button data-act="presenter" title="Presenter view (S)">◳</button>
+  <button data-act="fullscreen" title="Fullscreen (F)">⤢</button>
+  <button data-act="help" title="Shortcuts (?)">?</button>
+</div>
+
+<div id="overview" class="overlay-screen"><div class="close-hint">Esc / O to close</div><div class="grid"></div></div>
+<div id="help" class="overlay-screen">
+  <div class="close-hint">Esc / ? to close</div>
+  <h3>Keyboard shortcuts</h3>
+  <table>
+    <tr><td><kbd>→</kbd> <kbd>Space</kbd> <kbd>PgDn</kbd></td><td>Next / reveal</td><td style="width:40px"></td><td><kbd>F</kbd></td><td>Fullscreen</td></tr>
+    <tr><td><kbd>←</kbd> <kbd>PgUp</kbd></td><td>Previous</td><td></td><td><kbd>O</kbd></td><td>Overview grid</td></tr>
+    <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>First / last</td><td></td><td><kbd>S</kbd></td><td>Presenter view</td></tr>
+    <tr><td>type <kbd>n</kbd> then <kbd>↵</kbd></td><td>Jump to slide n</td><td></td><td><kbd>.</kbd></td><td>Toggle blackout</td></tr>
+  </table>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const STAGE_W = 1280, STAGE_H = 720;
+  const stage = document.getElementById("stage");
+  const slides = Array.from(stage.querySelectorAll(".slide"));
+  const N = slides.length;
+  const bar = document.querySelector("#progress > i");
+  const counter = document.getElementById("counter");
+  const overviewEl = document.getElementById("overview");
+  const helpEl = document.getElementById("help");
+  const channel = ("BroadcastChannel" in self) ? new BroadcastChannel("deck-sync") : null;
+
+  // number every slide + capture fragments
+  slides.forEach((s, i) => {
+    s.dataset.index = i;
+    if (!s.querySelector(".pagenum")) {
+      const p = document.createElement("span");
+      p.className = "pagenum"; p.textContent = (i + 1) + " / " + N;
+      s.appendChild(p);
+    }
+  });
+  const fragsOf = (i) => Array.from(slides[i].querySelectorAll(".fragment"));
+
+  let cur = 0, frag = 0, typed = "", black = false;
+
+  function clampFromHash() {
+    const m = /#(\d+)/.exec(location.hash);
+    if (m) cur = Math.min(N - 1, Math.max(0, parseInt(m[1], 10) - 1));
+  }
+
+  function render(push) {
+    cur = Math.min(N - 1, Math.max(0, cur));
+    slides.forEach((s, i) => {
+      s.classList.toggle("active", i === cur);
+      s.classList.toggle("is-past", i < cur);
+    });
+    fragsOf(cur).forEach((f, k) => f.classList.toggle("is-visible", k < frag));
+    bar.style.width = ((cur + 1) / N * 100) + "%";
+    counter.textContent = (cur + 1) + " / " + N;
+    document.documentElement.style.background = black ? "#000" : "";
+    stage.style.visibility = black ? "hidden" : "";
+    if (push !== false) history.replaceState(null, "", "#" + (cur + 1));
+    syncOut();
+    refreshOverviewCurrent();
+  }
+
+  function go(i) { cur = i; frag = 0; render(); }
+  function next() {
+    const fr = fragsOf(cur);
+    if (frag < fr.length) { frag++; render(); return; }
+    if (cur < N - 1) { cur++; frag = 0; render(); }
+  }
+  function prev() {
+    if (frag > 0) { frag--; render(); return; }
+    if (cur > 0) { cur--; frag = fragsOf(cur).length; render(); }
+  }
+
+  // ---- fit stage to viewport ----
+  function fit() {
+    const scale = Math.min(innerWidth / STAGE_W, innerHeight / STAGE_H);
+    stage.style.transform = `translate(-50%,-50%) scale(${scale})`;
+  }
+  addEventListener("resize", fit);
+
+  // ---- keyboard ----
+  addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (overviewEl.classList.contains("open") || helpEl.classList.contains("open")) {
+      if (k === "Escape" || k === "o" || k === "O" || k === "?") { closeOverlays(); e.preventDefault(); }
+      return;
+    }
+    if (/^[0-9]$/.test(k)) { typed += k; return; }
+    if (k === "Enter" && typed) { go(Math.min(N - 1, Math.max(0, parseInt(typed, 10) - 1))); typed = ""; return; }
+    typed = "";
+    switch (k) {
+      case "ArrowRight": case " ": case "PageDown": case "ArrowDown": next(); break;
+      case "ArrowLeft": case "PageUp": case "ArrowUp": prev(); break;
+      case "Home": go(0); break;
+      case "End": go(N - 1); break;
+      case "f": case "F": toggleFs(); break;
+      case "o": case "O": toggleOverview(); break;
+      case "s": case "S": openPresenter(); break;
+      case ".": black = !black; render(); break;
+      case "?": helpEl.classList.toggle("open"); break;
+      case "Escape": closeOverlays(); break;
+      default: return;
+    }
+    e.preventDefault();
+  });
+
+  // ---- click zones (ignore links/buttons) ----
+  stage.addEventListener("click", (e) => {
+    if (e.target.closest("a, button, input, textarea, select, [data-no-advance]")) return;
+    (e.clientX < innerWidth * 0.28 ? prev : next)();
+  });
+
+  // ---- touch swipe ----
+  let tx = 0, ty = 0;
+  addEventListener("touchstart", (e) => { tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }, { passive: true });
+  addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) (dx < 0 ? next : prev)();
+  }, { passive: true });
+
+  // ---- HUD buttons ----
+  document.getElementById("hud").addEventListener("click", (e) => {
+    const act = e.target.closest("button")?.dataset.act;
+    if (act === "overview") toggleOverview();
+    else if (act === "presenter") openPresenter();
+    else if (act === "fullscreen") toggleFs();
+    else if (act === "help") helpEl.classList.toggle("open");
+  });
+
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.();
+  }
+  function closeOverlays() { overviewEl.classList.remove("open"); helpEl.classList.remove("open"); }
+
+  // ---- overview grid ----
+  let overviewBuilt = false;
+  function buildOverview() {
+    const grid = overviewEl.querySelector(".grid");
+    grid.innerHTML = "";
+    slides.forEach((s, i) => {
+      const cell = document.createElement("div");
+      cell.className = "thumb"; cell.dataset.index = i;
+      const scaler = document.createElement("div");
+      scaler.className = "scaler";
+      scaler.appendChild(s.cloneNode(true));
+      scaler.querySelector(".slide")?.classList.add("active");
+      cell.appendChild(scaler);
+      const n = document.createElement("span"); n.className = "n"; n.textContent = i + 1; cell.appendChild(n);
+      cell.addEventListener("click", () => { closeOverlays(); go(i); });
+      grid.appendChild(cell);
+    });
+    requestAnimationFrame(() => {
+      grid.querySelectorAll(".thumb").forEach((c) => {
+        const sc = c.clientWidth / STAGE_W;
+        c.querySelector(".scaler").style.transform = `scale(${sc})`;
+      });
+    });
+    overviewBuilt = true;
+  }
+  function refreshOverviewCurrent() {
+    if (!overviewBuilt) return;
+    overviewEl.querySelectorAll(".thumb").forEach((c) =>
+      c.classList.toggle("current", +c.dataset.index === cur));
+  }
+  function toggleOverview() {
+    if (overviewEl.classList.contains("open")) { closeOverlays(); return; }
+    if (!overviewBuilt) buildOverview();
+    refreshOverviewCurrent();
+    helpEl.classList.remove("open");
+    overviewEl.classList.add("open");
+  }
+
+  // ---- presenter view ----
+  let pres = null;
+  function openPresenter() {
+    pres = window.open("", "deck-presenter", "width=1100,height=720");
+    if (!pres) return;
+    pres.document.write(PRESENTER_HTML());
+    pres.document.close();
+    syncOut();
+  }
+  function notesOf(i) { return slides[i].querySelector(".notes")?.innerHTML || "<em>No notes.</em>"; }
+  function syncOut() {
+    const payload = { cur, frag, n: N, notes: notesOf(cur), next: cur + 1 < N ? slides[cur + 1].outerHTML : "", t: title() };
+    channel?.postMessage(payload);
+    if (pres && !pres.closed) pres.postMessage({ deck: payload }, "*");
+  }
+  function title() { return document.title; }
+
+  // receive nav from presenter / other windows
+  channel?.addEventListener("message", (e) => onMsg(e.data));
+  addEventListener("message", (e) => onMsg(e.data && e.data.fromPresenter ? e.data : null));
+  function onMsg(d) {
+    if (!d) return;
+    if (d.cmd === "next") next();
+    else if (d.cmd === "prev") prev();
+    else if (typeof d.goto === "number") go(d.goto);
+  }
+
+  function PRESENTER_HTML() {
+    return `<!doctype html><html><head><meta charset=utf-8><title>Presenter · ${title()}</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;font:16px/1.5 ${getComputedStyle(document.body).fontFamily};background:#0c0d10;color:#e8eaed;height:100vh;display:grid;grid-template-rows:auto 1fr auto;gap:14px;padding:18px;box-sizing:border-box}
+  .top{display:flex;justify-content:space-between;align-items:baseline}
+  .clock{font-variant-numeric:tabular-nums;font-size:28px;font-weight:700}
+  .timer{font-size:15px;color:#9aa3b0}
+  .main{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;min-height:0}
+  .panel{background:#15171c;border:1px solid #262a31;border-radius:12px;padding:16px;overflow:auto;min-height:0}
+  .panel h4{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a93a0}
+  #notes{font-size:21px;line-height:1.55}
+  #next{position:relative;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
+  #next .scaler{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:top left}
+  .bar{display:flex;gap:10px;justify-content:center}
+  .bar button{all:unset;cursor:pointer;background:#1c1f26;border:1px solid #2c313a;border-radius:9px;padding:10px 22px;font-weight:600}
+  .bar button:hover{background:#242832}
+  .count{font-variant-numeric:tabular-nums;color:#9aa3b0;align-self:center}
+</style></head><body>
+  <div class="top"><div class="clock" id="clock">--:--</div><div class="timer" id="elapsed">elapsed 00:00</div></div>
+  <div class="main">
+    <div class="panel"><h4>Speaker notes</h4><div id="notes"></div></div>
+    <div>
+      <div class="panel" style="overflow:hidden"><h4>Next slide</h4><div id="next"></div></div>
+    </div>
+  </div>
+  <div class="bar"><button id="p">‹ Prev</button><span class="count" id="cnt"></span><button id="n">Next ›</button></div>
+<script>
+  const send=(o)=>{o.fromPresenter=true;try{window.opener&&window.opener.postMessage(o,'*')}catch(e){}};
+  document.getElementById('p').onclick=()=>send({cmd:'prev'});
+  document.getElementById('n').onclick=()=>send({cmd:'next'});
+  addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')send({cmd:'next'});if(e.key==='ArrowLeft')send({cmd:'prev'});});
+  const t0=Date.now();
+  setInterval(()=>{
+    const d=new Date();
+    document.getElementById('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const s=Math.floor((Date.now()-t0)/1000);
+    document.getElementById('elapsed').textContent='elapsed '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },1000);
+  addEventListener('message',e=>{
+    const d=e.data&&e.data.deck;if(!d)return;
+    document.getElementById('notes').innerHTML=d.notes;
+    document.getElementById('cnt').textContent=(d.cur+1)+' / '+d.n;
+    const box=document.getElementById('next');
+    box.innerHTML='';
+    if(d.next){const sc=document.createElement('div');sc.className='scaler';sc.innerHTML=d.next;
+      const sl=sc.querySelector('.slide');if(sl){sl.classList.add('active');sl.style.transition='none';}
+      box.appendChild(sc);requestAnimationFrame(()=>{sc.style.transform='scale('+(box.clientWidth/1280)+')';});}
+  });
+<\/script></body></html>`;
+  }
+
+  // ---- boot ----
+  clampFromHash();
+  addEventListener("hashchange", () => { clampFromHash(); frag = 0; render(false); });
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
